@@ -1,7 +1,7 @@
 import "../pages/index.css";
 
 import { closePopup, openPopup } from "./modal.js";
-import { createCard, remove, calling } from "./card.js";
+import { createCard, remove, handleLike, handleClickImage } from "./card.js";
 import { initialCards } from "./cards.js";
 
 export const profileEditButton = document.querySelector(
@@ -56,13 +56,33 @@ export function getValuesCreateCard(event) {
   };
 
   createAndAddCard(card);
-
+  popupFormNewCard.reset();
   closePopup(popupNewCard);
 }
-calling(initialCards);
+
+export function renderInitialCards(cards, handleLike, handleClickImage) {
+  cards.forEach(function (item) {
+    const card = createCard(
+      item.name,
+      item.link,
+      remove,
+      handleLike,
+      handleClickImage
+    );
+    loadingArea.appendChild(card);
+  });
+}
+
+renderInitialCards(initialCards, handleLike, handleClickImage);
 
 export function createAndAddCard(card) {
-  const newCard = createCard(card.name, card.link, remove);
+  const newCard = createCard(
+    card.name,
+    card.link,
+    remove,
+    handleLike,
+    handleClickImage
+  );
   loadingArea.prepend(newCard);
 }
 
@@ -85,6 +105,7 @@ popupCloseButton.forEach((button) => {
     closePopup(popup);
   });
 });
+
 
 
 
