@@ -6,49 +6,77 @@ import {
   loadingArea,
 } from "./index.js";
 import { openPopup } from "./modal.js";
+import { sendLike, deleteLike, deleteCard } from "./api.js";
 
-export function createCard(name, link, remove, handleLike, handleClickImage) {
-  const card = template.querySelector(".places__item").cloneNode(true);
-  const title = card.querySelector(".card__title");
-  const image = card.querySelector(".card__image");
-  const likeButton = card.querySelector(".card__like-button");
-  title.textContent = name;
-  image.setAttribute("alt", name);
-  image.setAttribute("src", link);
+export function createCard(card, user) {
+  const cardTemplate = template.querySelector(".places__item").cloneNode(true);
+  const title = cardTemplate.querySelector(".card__title");
+  const image = cardTemplate.querySelector(".card__image");
+  const likeButton = cardTemplate.querySelector(".card__like-button");
+  const trashButton = cardTemplate.querySelector(".card__delete-button");
+  const likes = cardTemplate.querySelector(".card__likes");
 
-  likeButton.addEventListener("click", (event) => {
-    handleLike(event);
-  });
+  likes.textContent = card.likes.length;
 
-  image.addEventListener("click", (event) => {
-    handleClickImage(event);
-  });
+  image.alt = card.name;
+  image.src = card.link;
 
-  card
-    .querySelector(".card__delete-button")
-    .addEventListener("click", function () {
-      remove(card);
-    });
-  return card;
+  title.textContent = card.name;
+
+  const isLiked = card.likes.find((_user) => _user._id === user._id);
+  if (isLiked) {
+    likeButton.classList.toggle("card__like-button_is-active");
+  }
+
+  const isOwner = card.owner._id === user._id;
+  if (isOwner) {
+    trashButton.style.setProperty("display", "block");
+  }
+
+  trashButton.addEventListener("click", (event) =>
+    deleteCardHandler(event, card)
+  );
+  likeButton.addEventListener("click", (event) =>
+    chacgeLikeHandler(event, card, likes)
+  );
+  image.addEventListener("click", handleClickImage);
+
+  return cardTemplate;
 }
 
-export function remove(card) {
-  card.remove();
+export function deleteCardHandler(event, card) {
+  deleteCard(card._id)
+    .then((response) => {
+      console.log(response);
+      event.target.closest(".places__item").remove();
+    })
+    .catch((error) => console.log(error));
 }
 
-// Функция обработки лайка
-export function handleLike(event) {
-  event.target.classList.toggle("card__like-button_is-active");
+export function chacgeLikeHandler(event, card, likes) {
+  const isLiked = event.target.classList.contains(
+    "card__like-button_is-active"
+  );
+  if (isLiked) {
+    deleteLike(card._id)
+      .then((card) => {
+        likes.textContent = card.likes.length;
+        event.target.classList.toggle("card__like-button_is-active");
+      })
+      .catch((error) => console.log(error));
+  } else {
+    sendLike(card._id)
+      .then((card) => {
+        likes.textContent = card.likes.length;
+        event.target.classList.toggle("card__like-button_is-active");
+      })
+      .catch((error) => console.log(error));
+  }
 }
 
-// Функция обработки клика по изображению
 export function handleClickImage(event) {
   popupImage.src = event.target.src;
   popupImage.alt = event.target.alt;
   cardTitle.textContent = event.target.alt;
   openPopup(popupImageContainer);
 }
-  
-
-  
-  
