@@ -1,10 +1,8 @@
 import "../pages/index.css";
 
 import { closePopup, openPopup } from "./modal.js";
-import { createCard } from "./card.js";
-import { initialCards } from "./cards.js";
-import { clearValidation, disableButton } from "./utils.js";
-import { enableValidation } from "./validate.js";
+import { createCard, deleteCardHandler, changeLikeHandler } from "./card.js";
+import { enableValidation, disableButton } from "./validate.js";
 import {
   getUserInfo,
   getCards,
@@ -51,6 +49,13 @@ export const profile = {
 export const template = document.querySelector("#card-template").content;
 export const loadingArea = document.querySelector(".places__list");
 
+export function handleClickImage(event) {
+  popupImage.src = event.target.src;
+  popupImage.alt = event.target.alt;
+  cardTitle.textContent = event.target.alt;
+  openPopup(popupImageContainer);
+}
+
 let user = null;
 const options = {
   formSelector: ".popup__form",
@@ -65,7 +70,15 @@ Promise.all([getUserInfo(), getCards()])
   .then(([user, cards]) => {
     initializeUser(user);
     cards.reverse().forEach((card) => {
-      loadingArea.prepend(createCard(card, user));
+      loadingArea.prepend(
+        createCard(
+          card,
+          user,
+          deleteCardHandler,
+          changeLikeHandler,
+          handleClickImage
+        )
+      );
     });
   })
   .catch((error) => console.log(error))
@@ -116,8 +129,15 @@ export function getValuesCreateCard(event) {
 
   createCardApi(card)
     .then((card) => {
-      clearValidation(popupInputCardName, popupInputUrl);
-      loadingArea.prepend(createCard(card, user));
+      loadingArea.prepend(
+        createCard(
+          card,
+          user,
+          deleteCardHandler,
+          changeLikeHandler,
+          handleClickImage
+        )
+      );
       closePopup(popupNewCard);
       disableButton(event.submitter, options);
     })

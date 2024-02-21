@@ -1,5 +1,3 @@
-import { toggleButtonState } from "./utils";
-
 export const showError = (formElement, inputElement, errorMessage, options) => {
   const errorElement = formElement.querySelector(`.${inputElement.id}-error`);
   errorElement.classList.add(options.errorClass);
@@ -23,7 +21,13 @@ export const checkInputValidity = (formElement, inputElement, options) => {
       options
     );
   } else {
-    hideError(formElement, inputElement, options);
+    const regex = /^[а-яА-ЯёЁa-zA-Z-\s]+$/;
+    if (!regex.test(inputElement.value)) {
+      const customErrorMessage = inputElement.dataset.errorMessage;
+      showError(formElement, inputElement, customErrorMessage, options);
+    } else {
+      hideError(formElement, inputElement, options);
+    }
   }
 };
 
@@ -55,3 +59,23 @@ export const enableValidation = (options) => {
     setEventListener(formElement, options);
   });
 };
+
+export function toggleButtonState(inputList, buttonElement, options) {
+  if (hasInvalidInput(inputList)) {
+    disableButton(buttonElement, options);
+  } else {
+    buttonElement.classList.remove(options.inactiveButtonClass);
+    buttonElement.removeAttribute("disabled");
+  }
+}
+
+export function disableButton(button, options) {
+  button.classList.add(options.inactiveButtonClass);
+  button.setAttribute("disabled", "disabled");
+}
+
+export function clearValidation(...inputs) {
+  inputs.forEach((input) => {
+    input.value = "";
+  });
+}
