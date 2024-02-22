@@ -2,7 +2,7 @@ import "../pages/index.css";
 
 import { closePopup, openPopup } from "./modal.js";
 import { createCard, deleteCardHandler, changeLikeHandler } from "./card.js";
-import { enableValidation, disableButton } from "./validate.js";
+import { enableValidation } from "./validate.js";
 import {
   getUserInfo,
   getCards,
@@ -110,7 +110,7 @@ export function editProfile(event) {
       profile.name.textContent = user.name;
       profile.description.textContent = user.about;
       closePopup(popupEdit);
-      disableButton(event.submitter, options);
+      clearValidation(formElement, options);
     })
     .catch((error) => console.log(error))
     .finally(() => {
@@ -139,7 +139,7 @@ export function getValuesCreateCard(event) {
         )
       );
       closePopup(popupNewCard);
-      disableButton(event.submitter, options);
+      clearValidation(formElement, options);
     })
     .catch((error) => console.log(error))
     .finally(() => {
@@ -169,7 +169,7 @@ formAvatar.addEventListener("submit", (event) => {
         `url(${user.avatar})`
       );
       closePopup(popupAvatar);
-      disableButton(event.submitter, options);
+      clearValidation(formElement, options);
     })
     .catch((error) => console.log(error))
     .finally(() => {

@@ -32,9 +32,7 @@ export const checkInputValidity = (formElement, inputElement, options) => {
 };
 
 export function hasInvalidInput(inputList) {
-  return inputList.some((inputElement) => {
-    return !inputElement.validity.valid;
-  });
+  return inputList.some((inputElement) => !inputElement.validity.valid);
 }
 
 export const setEventListener = (formElement, options) => {
@@ -69,13 +67,20 @@ export function toggleButtonState(inputList, buttonElement, options) {
   }
 }
 
-export function disableButton(button, options) {
-  button.classList.add(options.inactiveButtonClass);
-  button.setAttribute("disabled", "disabled");
+export function clearValidation(formElement, options) {
+  const inputList = Array.from(
+    formElement.querySelectorAll(options.inputSelector)
+  );
+  const buttonElement = formElement.querySelector(options.submitButtonSelector);
+
+  inputList.forEach((inputElement) => {
+    hideError(formElement, inputElement, options);
+  });
+
+  disableButton(buttonElement, options);
 }
 
-export function clearValidation(...inputs) {
-  inputs.forEach((input) => {
-    input.value = "";
-  });
+function disableButton(button, options) {
+  button.classList.add(options.inactiveButtonClass);
+  button.setAttribute("disabled", "disabled");
 }
